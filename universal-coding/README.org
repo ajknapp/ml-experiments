@@ -1,0 +1,21 @@
+* Prediction Over a Finite Alphabet Using a Universal Coding
+
+This is an implementation of the method described in Chapter 1 of the book /Compression-based methods of statistical analysis and prediction of time series/, by Boris Ryabko, Jaakko Astola, and Mikhail Malyutov. 
+The method is intended to predict the output of a stationary and ergodic process on a finite alphabet, which is assumed to be '0' and '1' by default.
+
+I've tried it on two sources of data: me trying to generate a random string consisting of zeros and ones, and suitably discretized daily FX rates.
+The predictor typically achieves accuracies of 60-70% on 250 samples of my button mashing, and 60-65% accuracy on 250 samples of the FX data.
+
+The predictor is extremely streaky: it rarely makes a single accurate prediction in isolation, but its accuracy is substantially better or worse than average during most periods.
+In one case, the predictor achieved 85% accuracy on the FX data over a 30 day period.
+
+** Usage
+
+The code expects input on STDIN, so you can use it interactively if you wish to play the guessing game against the predictor.
+Alternatively, if you have financial returns data you would like to discretize, use the command
+#+BEGIN_SRC
+cat data.csv | awk -F',' 'NR == 2 {old = $3; next } {print ($3-old > 0); old = $3 }' | pypy3 predictor.py training_rounds competitive_rounds
+#+END_SRC
+where training_rounds is the number of samples used to train the predictor and competitive_rounds is the number of samples used to measure performance.
+
+I recommend using pypy3 for performance reasons.
